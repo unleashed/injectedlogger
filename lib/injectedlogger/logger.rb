@@ -1,10 +1,8 @@
+require 'injectedlogger/errors'
 require 'injectedlogger/delegator'
 
 module InjectedLogger
   module Logger
-    Error = Class.new StandardError
-    InUse = Class.new Error
-
     UNKNOWN = :unknown
     LOGLEVELS = [:debug, :verbose, :notice, :info, :warn, :error, :critical, :fatal, :unknown]
 
