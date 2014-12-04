@@ -50,6 +50,10 @@ module InjectedLogger
         logger.send method, *args, &blk
       end
 
+      def respond_to_missing?(method, priv = false)
+        logger.respond_to_missing?(method, priv)
+      end
+
       private
 
       attr_accessor :logger
