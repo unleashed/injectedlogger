@@ -28,6 +28,7 @@ module InjectedLogger
         set_levels levels
         set_fallback fallback
         add_methods
+        self
       end
 
       def prefix=(prefix)
