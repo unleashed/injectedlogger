@@ -6,7 +6,7 @@ module InjectedLogger
     InUse = Class.new Error
 
     UNKNOWN = :unknown
-    LOGLEVELS = [:debug, :verbose, :info, :notice, :warn, :error, :critical, :fatal, :unknown]
+    LOGLEVELS = [:debug, :verbose, :notice, :info, :warn, :error, :critical, :fatal, :unknown]
 
     class << self
       attr_reader :prefix, :levels, :level_info, :fallback
