@@ -46,10 +46,12 @@ module InjectedLogger
 
       def method_missing(method, *args, &blk)
         logger.send method, *args, &blk
+      rescue NoMethodError
+        super
       end
 
       def respond_to_missing?(method, priv = false)
-        logger.respond_to_missing?(method, priv)
+        logger.respond_to?(method, priv) || super
       end
 
       private
