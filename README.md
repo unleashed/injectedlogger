@@ -7,7 +7,7 @@ It will try to support as many methods and levels as the underlying object suppo
 ## Usage
 
 ```ruby
-logger = InjectedLogger.use somelogger
+logger = InjectedLogger::Logger.use somelogger
 raise 'No info :(' unless logger.level_info[:supported].include? :info
 logger.info 'You now have a logger!'
 ```
