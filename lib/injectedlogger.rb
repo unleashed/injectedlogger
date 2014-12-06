@@ -6,7 +6,7 @@ module InjectedLogger
   # inject a default logger in case no one has set one for you:
   #
   # module MyLogger
-  #   InjectedLogger.inject self do
+  #   InjectedLogger.inject do
   #     require 'logger'
   #     # logger is required, the rest are other use() params
   #     { logger: Logger.new(STDERR), prefix: '[mylogger]', ... }
@@ -26,9 +26,10 @@ module InjectedLogger
   # logger method is called, so that it does not 'require' anything if it is not
   # needed. :)
 
-  def self.inject(klass, required: [], method_name: :logger, &blk)
-    klass.send :remove_method, method_name rescue nil
-    klass.send :define_method, method_name do
+  def self.inject(on: nil, required: [], method_name: :logger, &blk)
+    on = blk.binding.eval 'self' unless on
+    on = on.singleton_class unless on.is_a? Module
+    on.send :define_method, method_name do
       unless InjectedLogger::Logger.in_use?
         args = blk.call
         logger = args.delete :logger
@@ -41,8 +42,7 @@ module InjectedLogger
       required.uniq!
       required -= InjectedLogger::Logger.level_info[:supported]
       raise InjectedLogger::UnsupportedLevels.new(required) if not required.empty?
-      klass.send :remove_method, method_name
-      klass.send :define_method, method_name do
+      on.send :define_method, method_name do
         InjectedLogger::Logger
       end
       InjectedLogger::Logger
