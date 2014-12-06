@@ -16,7 +16,7 @@ or you can set-up a default injection for your logger in case no one else sets i
 
 ```ruby
 module MyLogger
-  InjectedLogger.inject self, required: [:debug, :info] do
+  InjectedLogger.inject required: [:debug, :info] do
     require 'logger'
     { logger: Logger.new(STDERR), prefix: '[mylogger]' }
   end
