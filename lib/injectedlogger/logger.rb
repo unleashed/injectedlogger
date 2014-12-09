@@ -2,6 +2,18 @@ require 'injectedlogger/errors'
 require 'injectedlogger/delegator'
 
 module InjectedLogger
+  def self.injected?
+    Logger.injected?
+  end
+
+  def self.inject(*args)
+    Logger.inject(*args)
+  end
+
+  def self.inject!(*args)
+    Logger.inject!(*args)
+  end
+
   module Logger
     UNKNOWN = :unknown
     LOGLEVELS = [:debug, :verbose, :notice, :info, :warn, :error, :critical, :fatal, :unknown]
