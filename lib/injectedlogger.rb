@@ -27,8 +27,12 @@ module InjectedLogger
   # needed. :)
 
   def self.inject(on: nil, required: [], method_name: :logger, &blk)
-    on = blk.binding.eval 'self' unless on
-    on = on.singleton_class unless on.is_a? Module
+    if on.nil?
+      raise InjectedLogger::DefaultInjectionBlockMissing if blk.nil?
+      on = blk.binding.eval 'self'
+    else
+      on = on.singleton_class unless on.is_a? Module
+    end
     on.send :define_method, method_name do
       unless InjectedLogger::Logger.in_use?
         args = blk.call
