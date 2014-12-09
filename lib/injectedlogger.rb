@@ -37,13 +37,9 @@ module InjectedLogger
       # avoid recursion if someone calls logger in the block
       on.send :remove_method, method_name
       unless InjectedLogger::Logger.in_use?
-        args = blk.call
-        logger = args.delete :logger
-        unless required.empty?
-          args[:levels] ||= []
-          args[:levels].push(required).flatten!.uniq!
-        end
-        InjectedLogger::Logger.use(logger, args)
+        args = blk ? blk.call : nil
+        args = default_logger if args.nil? or args == :default
+        inject_logger args, required
       end
       required.uniq!
       required -= InjectedLogger::Logger.level_info[:supported]
@@ -53,5 +49,21 @@ module InjectedLogger
       end
       InjectedLogger::Logger
     end
+  end
+
+  private
+
+  def self.default_logger
+    require 'logger'
+    { logger: ::Logger.new(STDERR) }
+  end
+
+  def self.inject_logger(args, required)
+    logger = args.delete :logger
+    unless required.empty?
+      args[:levels] ||= []
+      args[:levels].push(required).flatten!.uniq!
+    end
+    InjectedLogger::Logger.use(logger, args)
   end
 end
