@@ -43,7 +43,7 @@ module InjectedLogger
     on.send :define_method, method_name do
       # avoid recursion if someone calls logger in the block
       on.send :remove_method, method_name
-      unless InjectedLogger::Logger.injected?
+      unless InjectedLogger.injected?
         args = blk ? blk.call : nil
         InjectedLogger.inject_logger args, required
       end
@@ -83,6 +83,6 @@ module InjectedLogger
       args[:levels].push(required).flatten!
       args[:levels].uniq!
     end
-    InjectedLogger::Logger.inject(logger, args)
+    InjectedLogger.inject(logger, args)
   end
 end
