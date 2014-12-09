@@ -47,8 +47,18 @@ module InjectedLogger
       on.send :define_method, method_name do
         InjectedLogger::Logger
       end
+      InjectedLogger.after_hook.call(InjectedLogger::Logger) if InjectedLogger.after_hook
       InjectedLogger::Logger
     end
+  end
+
+  def self.after_injection(&blk)
+    self.after_hook = blk
+  end
+
+  class << self
+    attr_accessor :after_hook
+    private :after_hook=
   end
 
   private
