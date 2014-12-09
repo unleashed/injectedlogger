@@ -8,7 +8,7 @@ module InjectedLogger
   # module MyLogger
   #   InjectedLogger.inject do
   #     require 'logger'
-  #     # logger is required, the rest are other use() params
+  #     # logger is required, the rest are other inject() params
   #     { logger: Logger.new(STDERR), prefix: '[mylogger]', ... }
   #   end
   # end
@@ -26,7 +26,7 @@ module InjectedLogger
   # logger method is called, so that it does not 'require' anything if it is not
   # needed. :)
 
-  def self.inject(on: nil, required: [], method_name: :logger, &blk)
+  def self.declare(on: nil, required: [], method_name: :logger, &blk)
     if on.nil?
       raise InjectedLogger::DefaultInjectionBlockMissing if blk.nil?
       on = blk.binding.eval 'self'
@@ -36,7 +36,7 @@ module InjectedLogger
     on.send :define_method, method_name do
       # avoid recursion if someone calls logger in the block
       on.send :remove_method, method_name
-      unless InjectedLogger::Logger.in_use?
+      unless InjectedLogger::Logger.injected?
         args = blk ? blk.call : nil
         args = default_logger if args.nil? or args == :default
         inject_logger args, required
@@ -64,6 +64,6 @@ module InjectedLogger
       args[:levels] ||= []
       args[:levels].push(required).flatten!.uniq!
     end
-    InjectedLogger::Logger.use(logger, args)
+    InjectedLogger::Logger.inject(logger, args)
   end
 end

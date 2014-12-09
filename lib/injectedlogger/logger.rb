@@ -9,18 +9,18 @@ module InjectedLogger
     class << self
       attr_reader :prefix, :levels, :level_info, :fallback
 
-      def in_use?
+      def injected?
         not logger.nil?
       end
 
-      def use(logger_obj, levels: LOGLEVELS, fallback: UNKNOWN, prefix: nil)
+      def inject(logger_obj, levels: LOGLEVELS, fallback: UNKNOWN, prefix: nil)
         if logger and logger != logger_obj
           raise InUse, "#{self} was already using logger #{logger}"
         end
-        use! logger_obj, levels: levels, fallback: fallback
+        inject! logger_obj, levels: levels, fallback: fallback
       end
 
-      def use!(logger_obj, levels: LOGLEVELS, fallback: UNKNOWN, prefix: nil)
+      def inject!(logger_obj, levels: LOGLEVELS, fallback: UNKNOWN, prefix: nil)
         self.logger = logger_obj
         set_prefix prefix
         set_levels levels

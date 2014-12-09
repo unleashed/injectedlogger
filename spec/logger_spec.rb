@@ -66,7 +66,7 @@ module InjectedLogger
       let(:logger_object) { Helpers::RubyLikeLogger.new [] }
 
       before do
-        InjectedLogger::Logger.use! logger_object
+        InjectedLogger::Logger.inject! logger_object
         #l = InjectedLogger::Logger
         #STDERR.puts "Native: #{l.level_info[:native]} Non-native: #{l.level_info[:nonnative]} Fallback: #{l.level_info[:fallback]} Info: #{l.level_info[:info]}"
       end

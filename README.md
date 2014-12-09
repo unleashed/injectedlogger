@@ -7,7 +7,7 @@ It will try to support as many methods and levels as the underlying object suppo
 ## Usage
 
 ```ruby
-logger = InjectedLogger::Logger.use somelogger
+logger = InjectedLogger::Logger.inject somelogger
 raise 'No info :(' unless logger.level_info[:supported].include? :info
 logger.info 'You now have a logger!'
 ```
@@ -16,7 +16,7 @@ or you can set-up a default injection for your logger in case no one else sets i
 
 ```ruby
 module MyLogger
-  InjectedLogger.inject required: [:debug, :info] do
+  InjectedLogger.declare required: [:debug, :info] do
     require 'logger'
     { logger: Logger.new(STDERR), prefix: '[mylogger]' }
   end
