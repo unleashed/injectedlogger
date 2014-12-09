@@ -62,8 +62,15 @@ module InjectedLogger
       def add_as_fallback(nonnative, fallback)
         nonnative.each do |lvl|
           remove_level lvl
-          add_level lvl do |msg|
-            public_send fallback, "[#{lvl.upcase}] #{msg}"
+          add_level lvl do |*msg, &blk|
+            if blk
+              public_send fallback, *msg do
+                str = blk.call
+                "[#{lvl.upcase}] #{str}"
+              end
+            else
+              public_send fallback, "[#{lvl.upcase}] #{msg.join ' '}"
+            end
           end
         end
       end
@@ -92,12 +99,19 @@ module InjectedLogger
 
       def add_level_method(lvl)
         if prefix.nil? or prefix.empty?
-          add_level lvl do |msg|
-            logger.send lvl, msg
+          add_level lvl do |*msg, &blk|
+            logger.send lvl, *msg, &blk
           end
         else
-          add_level lvl do |msg|
-            logger.send lvl, "#{prefix} #{msg}"
+          add_level lvl do |*msg, &blk|
+            if blk
+              logger.send lvl, *msg do
+                str = blk.call
+                "#{prefix} #{str}"
+              end
+            else
+              logger.send lvl, "#{prefix} #{msg.join ' '}"
+            end
           end
         end
       end
