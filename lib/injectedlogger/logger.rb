@@ -51,6 +51,12 @@ module InjectedLogger
         add_methods
       end
 
+      def add_levels(*levels)
+        lvls = self.levels + levels
+        lvls.uniq!
+        self.levels = lvls
+      end
+
       def fallback=(level)
         set_fallback level
         add_methods
