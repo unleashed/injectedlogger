@@ -29,7 +29,7 @@ module InjectedLogger
 
   def self.declare(on: nil, required: [], method_name: :logger, &blk)
     if on.nil?
-      raise InjectedLogger::DefaultInjectionBlockMissing if blk.nil?
+      raise DefaultInjectionBlockMissing if blk.nil?
       on = blk.binding.eval 'self'
     else
       on = on.singleton_class unless on.is_a? Module
@@ -77,6 +77,6 @@ module InjectedLogger
       args[:levels].push(required).flatten!
       args[:levels].uniq!
     end
-    InjectedLogger::Logger.inject(logger, args)
+    Logger.inject(logger, args)
   end
 end
