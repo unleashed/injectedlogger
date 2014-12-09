@@ -49,7 +49,7 @@ module InjectedLogger
       end
       required.uniq!
       required -= InjectedLogger::Logger.level_info[:supported]
-      raise InjectedLogger::UnsupportedLevels.new(required) if not required.empty?
+      raise InjectedLogger::UnsupportedLevels.new(required) unless required.empty?
       on.send :define_method, method_name do
         InjectedLogger::Logger
       end
