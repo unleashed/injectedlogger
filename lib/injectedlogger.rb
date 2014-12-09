@@ -6,7 +6,7 @@ module InjectedLogger
   # inject a default logger in case no one has set one for you:
   #
   # module MyLogger
-  #   InjectedLogger.declare do
+  #   InjectedLogger.use :info, :debug, :invented do
   #     require 'logger'
   #     # parameters are inject() params, none is required, but if
   #     # logger is not present, a default one will be used.
@@ -20,6 +20,12 @@ module InjectedLogger
   #   def some_method_needing_logging
   #     logger.info 'some info'
   #   end
+  #
+  #   def some_method_with_invented_level_logging
+  #     logger.invented do
+  #       'some invented logging'
+  #     end
+  #   end
   # end
   #
   # This will only run the block passed to inject IFF there was no logger set
@@ -27,7 +33,7 @@ module InjectedLogger
   # logger method is called, so that it does not 'require' anything if it is not
   # needed. :)
 
-  def self.declare(on: nil, required: [], method_name: :logger, &blk)
+  def self.use(*required, on: nil, method_name: :logger, &blk)
     if on.nil?
       raise InjectedLogger::DefaultInjectionBlockMissing if blk.nil?
       on = blk.binding.eval 'self'
