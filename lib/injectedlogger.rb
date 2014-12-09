@@ -6,7 +6,7 @@ module InjectedLogger
   # inject a default logger in case no one has set one for you:
   #
   # module MyLogger
-  #   InjectedLogger.inject do
+  #   InjectedLogger.declare do
   #     require 'logger'
   #     # parameters are inject() params, none is required, but if
   #     # logger is not present, a default one will be used.
