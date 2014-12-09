@@ -38,8 +38,8 @@ module InjectedLogger
       on.send :remove_method, method_name
       unless InjectedLogger::Logger.injected?
         args = blk ? blk.call : nil
-        args = default_logger if args.nil? or args == :default
-        inject_logger args, required
+        args = InjectedLogger.default_logger if args.nil? or args == :default
+        InjectedLogger.inject_logger args, required
       end
       required.uniq!
       required -= InjectedLogger::Logger.level_info[:supported]
