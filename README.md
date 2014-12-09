@@ -17,8 +17,12 @@ or you can set-up a default injection for your logger in case no one else sets i
 ```ruby
 module MyLogger
   InjectedLogger.declare required: [:debug, :info] do
+    # this gets executed if no logger has been injected at use time
     require 'logger'
     { logger: Logger.new(STDERR), prefix: '[mylogger]' }
+  end
+  InjectedLogger.after_injection do |logger|
+    logger.info 'ok' # you can also force your prefix with logger.prefix = str
   end
 end
 
@@ -32,7 +36,10 @@ end
 
 class ThisAlsoWantsIt
   include MyLogger
-  ...
+
+  def some_other_method_with_debug_logging
+    logger.debug 'some_debug_info'
+  end
 end
 ```
 
