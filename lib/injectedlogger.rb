@@ -8,7 +8,8 @@ module InjectedLogger
   # module MyLogger
   #   InjectedLogger.inject do
   #     require 'logger'
-  #     # logger is required, the rest are other inject() params
+  #     # parameters are inject() params, none is required, but if
+  #     # logger is not present, a default one will be used.
   #     { logger: Logger.new(STDERR), prefix: '[mylogger]', ... }
   #   end
   # end
@@ -38,7 +39,6 @@ module InjectedLogger
       on.send :remove_method, method_name
       unless InjectedLogger::Logger.injected?
         args = blk ? blk.call : nil
-        args = InjectedLogger.default_logger if args.nil? or args == :default
         InjectedLogger.inject_logger args, required
       end
       required.uniq!
@@ -59,6 +59,8 @@ module InjectedLogger
   end
 
   def self.inject_logger(args, required)
+    args ||= {}
+    args = default_logger.merge(args) unless args.has_key? :logger
     logger = args.delete :logger
     unless required.empty?
       args[:levels] ||= []
