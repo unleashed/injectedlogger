@@ -34,6 +34,8 @@ module InjectedLogger
       on = on.singleton_class unless on.is_a? Module
     end
     on.send :define_method, method_name do
+      # avoid recursion if someone calls logger in the block
+      on.send :remove_method, method_name
       unless InjectedLogger::Logger.in_use?
         args = blk.call
         logger = args.delete :logger
