@@ -62,7 +62,8 @@ module InjectedLogger
     logger = args.delete :logger
     unless required.empty?
       args[:levels] ||= []
-      args[:levels].push(required).flatten!.uniq!
+      args[:levels].push(required).flatten!
+      args[:levels].uniq!
     end
     InjectedLogger::Logger.inject(logger, args)
   end
