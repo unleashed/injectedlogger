@@ -126,14 +126,25 @@ module InjectedLogger
           if prefix and not prefix.empty?
             prefix_s += " " + prefix
           end
-          klass.define_singleton_method lvl do |msg|
-            logger.send :log, "#{prefix_s} #{msg}"
+          klass.define_singleton_method lvl do |*msg, &blk|
+            if blk
+              logger.send :log, *msg do
+                str = blk.call
+                "#{prefix_s} #{str}"
+              end
+            else
+              logger.send :log, "#{prefix_s} #{msg.join ' '}"
+            end
           end
         else
           # assume two or more params, best effort with 1st being level
           if lvl_s = ruby_logger_severity(lvl)
-            klass.define_singleton_method lvl do |msg|
-              logger.send :log, lvl_s, msg
+            klass.define_singleton_method lvl do |*msg, &blk|
+              if blk
+                logger.send :log, lvl_s, *msg, &blk
+              else
+                logger.send :log, lvl_s, msg.join(' ')
+              end
             end
           end
         end
