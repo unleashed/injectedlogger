@@ -4,25 +4,19 @@ This gem can be used to inject a logger in your Ruby code.
 
 It will try to support as many methods and levels as the underlying object supports, and fall back to a supported level in case some levels are not available
 
-## Usage
+## Usage examples
 
-```ruby
-logger = InjectedLogger::Logger.inject somelogger
-raise 'No info :(' unless logger.level_info[:supported].include? :info
-logger.info 'You now have a logger!'
-```
-
-or you can set-up a default injection for your logger in case no one else sets it up before you need to log something:
+### On your code, which receives a logger from some foreign caller:
 
 ```ruby
 module MyLogger
-  InjectedLogger.declare required: [:debug, :info] do
+  InjectedLogger.use :debug, :info, :invented do
     # this gets executed if no logger has been injected at use time
     require 'logger'
-    { logger: Logger.new(STDERR), prefix: '[mylogger]' }
+    { logger: Logger.new(STDERR) }
   end
   InjectedLogger.after_injection do |logger|
-    logger.info 'ok' # you can also force your prefix with logger.prefix = str
+    logger.prefix = '[myproject]'
   end
 end
 
@@ -30,7 +24,7 @@ class WantsLogging
   include MyLogger
 
   def some_method_needing_logging
-    logger.info 'some_info'
+    logger.info 'some info'
   end
 end
 
@@ -38,9 +32,15 @@ class ThisAlsoWantsIt
   include MyLogger
 
   def some_other_method_with_debug_logging
-    logger.debug 'some_debug_info'
+    logger.invented 'some invented info'
   end
 end
+```
+
+### On the code injecting a logger:
+
+```ruby
+InjectedLogger.inject somelogger
 ```
 
 ## Generating the gem
