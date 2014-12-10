@@ -20,11 +20,17 @@ module InjectedLogger
     logger[on].inject!(*args, **options)
   end
 
+  def self.after_injection(&blk)
+    on = blk.binding.eval 'self'
+    logger[on].after_hook = blk
+  end
+
   class Logger
     UNKNOWN = :unknown
     LOGLEVELS = [:debug, :verbose, :notice, :info, :warn, :error, :critical, :fatal, :unknown]
 
     attr_reader :prefix, :levels, :level_info, :fallback
+    attr_accessor :after_hook
 
     def injected?
       not logger.nil?
@@ -99,7 +105,11 @@ module InjectedLogger
       self.level_info = InjectedLogger::Delegator.delegate_levels(
         from: logger, on: self, prefix: prefix, extra_levels: self.levels,
         old_levels: old_levels, fallback: fallback)
-      set_levels(level_info[:supported]).tap do
+      set_levels(level_info[:supported])
+    end
+
+    def ready
+      level_info[:supported].tap do
         info_message(level_info) if level_info[:info]
       end
     end

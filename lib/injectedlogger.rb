@@ -58,18 +58,10 @@ module InjectedLogger
       on.send :define_method, method_name do
         thislogger
       end
-      InjectedLogger.after_hook.call(thislogger) if InjectedLogger.after_hook
+      thislogger.after_hook.call(thislogger) if thislogger.after_hook
+      thislogger.send :ready
       thislogger
     end
-  end
-
-  def self.after_injection(&blk)
-    self.after_hook = blk
-  end
-
-  class << self
-    attr_accessor :after_hook
-    private :after_hook=
   end
 
   private
