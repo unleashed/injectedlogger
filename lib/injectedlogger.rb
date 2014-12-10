@@ -43,22 +43,23 @@ module InjectedLogger
     on.send :define_method, method_name do
       # avoid recursion if someone calls logger in the block
       on.send :remove_method, method_name
-      unless InjectedLogger.injected?
+      unless InjectedLogger.injected? on: on
         args = blk ? blk.call : nil
-        InjectedLogger.inject_logger args, required
+        InjectedLogger.inject_logger args, required, on: on
       end
+      thislogger = InjectedLogger.send(:logger).[](on)
       required.uniq!
-      required -= InjectedLogger::Logger.level_info[:supported]
+      required -= thislogger.level_info[:supported]
       unless required.empty?
-        InjectedLogger::Logger.add_levels(*required)
-        required -= InjectedLogger::Logger.level_info[:supported]
+        thislogger.add_levels(*required)
+        required -= thislogger.level_info[:supported]
         raise InjectedLogger::UnsupportedLevels.new(required) unless required.empty?
       end
       on.send :define_method, method_name do
-        InjectedLogger::Logger
+        thislogger
       end
-      InjectedLogger.after_hook.call(InjectedLogger::Logger) if InjectedLogger.after_hook
-      InjectedLogger::Logger
+      InjectedLogger.after_hook.call(thislogger) if InjectedLogger.after_hook
+      thislogger
     end
   end
 
@@ -78,7 +79,7 @@ module InjectedLogger
     { logger: ::Logger.new(STDERR) }
   end
 
-  def self.inject_logger(args, required)
+  def self.inject_logger(args, required, on:)
     args ||= {}
     args = default_logger.merge(args) unless args.has_key? :logger
     logger = args.delete :logger
@@ -87,6 +88,7 @@ module InjectedLogger
       args[:levels].push(required).flatten!
       args[:levels].uniq!
     end
-    InjectedLogger.inject(logger, args)
+    args[:on] = on
+    InjectedLogger.inject(logger, **args)
   end
 end
