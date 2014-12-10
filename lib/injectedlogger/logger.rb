@@ -20,8 +20,8 @@ module InjectedLogger
     logger[on].inject!(*args, **options)
   end
 
-  def self.after_injection(&blk)
-    on = blk.binding.eval 'self'
+  def self.after_injection(on: nil, &blk)
+    on = blk.binding.eval 'self' if on.nil?
     logger[on].after_hook = blk
   end
 
