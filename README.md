@@ -40,7 +40,7 @@ end
 ### On the code injecting a logger:
 
 ```ruby
-InjectedLogger.inject somelogger
+InjectedLogger.inject somelogger, on: MyLogger
 ```
 
 ## Generating the gem
