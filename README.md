@@ -1,6 +1,6 @@
 # A logger injection gem
 
-This gem can be used to inject a logger in your Ruby code.
+This gem can be used to inject several loggers in different parts of your Ruby project.
 
 It will try to support as many methods and levels as the underlying object supports, and fall back to a supported level in case some levels are not available
 
@@ -41,6 +41,12 @@ end
 
 ```ruby
 InjectedLogger.inject somelogger, on: MyLogger
+```
+
+### In case some other dependency needs a logger:
+
+```ruby
+InjectedLogger.inject somelogger, prefix: '[other]', on: Other::Logger
 ```
 
 ## Generating the gem
