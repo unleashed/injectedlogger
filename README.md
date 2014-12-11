@@ -31,7 +31,7 @@ end
 class ThisAlsoWantsIt
   include MyLogger
 
-  def some_other_method_with_debug_logging
+  def some_other_method_with_invented_logging
     logger.invented 'some invented info'
   end
 end
