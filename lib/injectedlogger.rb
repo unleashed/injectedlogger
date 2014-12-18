@@ -33,16 +33,18 @@ module InjectedLogger
   # logger method is called, so that it does not 'require' anything if it is not
   # needed. :)
 
-  def self.use(*required, on: nil, method_name: :logger, &blk)
+  def self.use(*required, on: nil, as: nil, method_name: :logger, &blk)
     if on.nil?
       raise InjectedLogger::DefaultInjectionBlockMissing if blk.nil?
       on = blk.binding.eval 'self'
     else
       on = on.singleton_class unless on.is_a? Module
     end
-    on.send :define_method, method_name do
+    target = on
+    on = as unless as.nil?
+    target.send :define_method, method_name do
       # avoid recursion if someone calls logger in the block
-      on.send :remove_method, method_name
+      target.send :remove_method, method_name
       unless InjectedLogger.injected? on: on
         args = blk ? blk.call : nil
         InjectedLogger.inject_logger args, required, on: on
@@ -55,7 +57,7 @@ module InjectedLogger
         required -= thislogger.level_info[:supported]
         raise InjectedLogger::UnsupportedLevels.new(required) unless required.empty?
       end
-      on.send :define_method, method_name do
+      target.send :define_method, method_name do
         thislogger
       end
       thislogger.after_hook.call(thislogger) if thislogger.after_hook
