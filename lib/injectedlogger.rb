@@ -71,7 +71,7 @@ module InjectedLogger
     { logger: ::Logger.new(STDERR) }
   end
 
-  def self.inject_logger(args, required, on:)
+  def self.inject_logger(args, required, **options)
     args ||= {}
     args = default_logger.merge(args) unless args.has_key? :logger
     logger = args.delete :logger
@@ -80,7 +80,7 @@ module InjectedLogger
       args[:levels].push(required).flatten!
       args[:levels].uniq!
     end
-    args[:on] = on
+    args.merge!(**options)
     InjectedLogger.inject(logger, **args)
   end
 end
