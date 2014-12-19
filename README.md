@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/injectedlogger.svg)](http://badge.fury.io/rb/injectedlogger)
+
 # A logger injection gem
 
 This gem can be used to inject several loggers in different parts of your Ruby project.
