@@ -40,7 +40,7 @@ module InjectedLogger
       if logger and logger != logger_obj
         raise InUse, "#{self} was already using logger #{logger}"
       end
-      inject! logger_obj, levels: levels, fallback: fallback
+      inject! logger_obj, levels: levels, fallback: fallback, prefix: prefix
     end
 
     def inject!(logger_obj, levels: LOGLEVELS, fallback: UNKNOWN, prefix: nil)
