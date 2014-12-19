@@ -46,8 +46,21 @@ class C < Messaging
   include IL
 end
 
+module NL
+  InjectedLogger.use :info, :debug, :invented, as: 'core-log' do end
+  InjectedLogger.after_injection on: 'core-log' do |l|
+    l.info 'WORKS :)'
+  end
+end
+
+class D < Messaging
+  include NL
+end
+
 require 'logger'
-InjectedLogger.inject Logger.new(STDERR), prefix: '[prefix]', levels: [:invented], on: IL
+l = Logger.new STDERR
+InjectedLogger.inject l, prefix: '[prefix]', levels: [:invented], on: IL
+InjectedLogger.inject l, prefix: '[prefix-as-name]', levels: [:invented], on: 'core-log'
 
 test A
 test B
@@ -56,3 +69,4 @@ test A
 test B
 test C
 
+test D
