@@ -42,6 +42,12 @@ module IL
   InjectedLogger.after_injection do |l| l.prefix = '[injected-rubylogger]' end
 end
 
+module IL2
+  InjectedLogger.use :info, :debug, :invented, on: self
+  raise unless IL2.respond_to? :inject
+  InjectedLogger.after_injection do |l| l.prefix = '[injected-rubylogger-nodep]' end
+end
+
 class C < Messaging
   include IL
 end
@@ -57,10 +63,15 @@ class D < Messaging
   include NL
 end
 
+class E < Messaging
+  include IL2
+end
+
 require 'logger'
 l = Logger.new STDERR
 InjectedLogger.inject l, prefix: '[prefix]', levels: [:invented], on: IL
 InjectedLogger.inject l, prefix: '[prefix-as-name]', levels: [:invented], on: 'core-log'
+IL2.inject l, prefix: '[prefix-nodep]', levels: [:invented]
 
 test A
 test B
@@ -70,3 +81,4 @@ test B
 test C
 
 test D
+test E
