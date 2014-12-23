@@ -40,17 +40,16 @@ module InjectedLogger
     else
       on = on.singleton_class unless on.is_a? Module
     end
-    target = on
-    on = as unless as.nil?
+    InjectedLogger.logger_known as: as, refers_to: on unless as.nil?
     [:inject, :inject!].each do |m|
-      target.define_singleton_method m do |*args, **options|
-        options.merge! on: target
+      on.define_singleton_method m do |*args, **options|
+        options.merge! on: on
         InjectedLogger.public_send m, *args, **options
       end
     end
-    target.send :define_method, method_name do
+    on.send :define_method, method_name do
       # avoid recursion if someone calls logger in the block
-      target.send :remove_method, method_name
+      on.send :remove_method, method_name
       unless InjectedLogger.injected? on: on
         args = blk ? blk.call : nil
         InjectedLogger.inject_logger args, required, on: on
@@ -63,7 +62,7 @@ module InjectedLogger
         required -= thislogger.level_info[:supported]
         raise InjectedLogger::UnsupportedLevels.new(required) unless required.empty?
       end
-      target.send :define_method, method_name do
+      on.send :define_method, method_name do
         thislogger
       end
       thislogger.after_hook.call(thislogger) if thislogger.after_hook
