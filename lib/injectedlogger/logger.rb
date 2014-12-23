@@ -25,6 +25,11 @@ module InjectedLogger
     logger[on].after_hook = blk
   end
 
+  def self.logger_known(as:, refers_to:)
+    logger[as] = logger[refers_to]
+  end
+  singleton_class.send :protected, :logger_known
+
   class Logger
     UNKNOWN = :unknown
     LOGLEVELS = [:debug, :verbose, :notice, :info, :warn, :error, :critical, :fatal, :unknown]
