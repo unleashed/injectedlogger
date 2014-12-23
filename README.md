@@ -43,6 +43,12 @@ Inject our logger on `Dependency::Logger` and prefix the messages with `'[logger
 InjectedLogger.inject mylogger, prefix: '[logger-for-dep]', on: Dependency::Logger
 ```
 
+You can also *avoid* depending on InjectedLogger if you call the `inject` method
+directly on the class/module where your dependency declares the logger:
+```ruby
+Dependency::Logger.inject mylogger, prefix: '[logger-for-dep]'
+```
+
 ### On the code where you want a logger injected:
 
 This sets up a module with a `logger` method identified as `'dependency-logger'`
