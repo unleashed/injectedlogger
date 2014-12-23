@@ -42,6 +42,12 @@ module InjectedLogger
     end
     target = on
     on = as unless as.nil?
+    [:inject, :inject!].each do |m|
+      target.define_singleton_method m do |*args, **options|
+        options.merge! on: target
+        InjectedLogger.public_send m, *args, **options
+      end
+    end
     target.send :define_method, method_name do
       # avoid recursion if someone calls logger in the block
       target.send :remove_method, method_name
