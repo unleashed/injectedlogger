@@ -117,6 +117,15 @@ Note that you do not need to specify the `:on` parameter for `InjectedLogger.use
 nor `InjectedLogger.after_injection` IFF you provide a block to those methods
 and want to imply `on: self`.
 
+You can also get the logger invoking it directly on your module:
+```ruby
+SomeOtherGem.logger = Dependency::Logger.logger
+```
+or... :)
+```ruby
+OtherDependency.inject Dependency::Logger.logger, prefix: '[other-dependency]'
+```
+
 ## Generating the gem
 
 Both bundler and rspec are required to build the gem:
