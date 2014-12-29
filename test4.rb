@@ -82,3 +82,8 @@ test C
 
 test D
 test E
+
+# now test that it has :logger in the module
+NL.logger.info do
+  'done'
+end
