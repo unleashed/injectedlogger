@@ -37,19 +37,24 @@ module InjectedLogger
     if on.nil?
       raise InjectedLogger::DefaultInjectionBlockMissing if blk.nil?
       on = blk.binding.eval 'self'
-    else
-      on = on.singleton_class unless on.is_a? Module
     end
+    on = on.singleton_class unless on.is_a? Module
     InjectedLogger.logger_known as: as, refers_to: on unless as.nil?
-    [:inject, :inject!].each do |m|
-      on.define_singleton_method m do |*args, **options|
+    targets = [on]
+    targets << on.singleton_class unless on.singleton_class?
+    targets.each do |target|
+      [:inject, :inject!].each do |m|
+        target.define_singleton_method m do |*args, **options|
         options.merge! on: on
         InjectedLogger.public_send m, *args, **options
+        end
       end
     end
-    on.send :define_method, method_name do
+    prelogger = proc do
       # avoid recursion if someone calls logger in the block
-      on.send :remove_method, method_name
+      targets.each do |target|
+        target.send :remove_method, method_name
+      end
       unless InjectedLogger.injected? on: on
         args = blk ? blk.call : nil
         InjectedLogger.inject_logger args, required, on: on
@@ -62,12 +67,17 @@ module InjectedLogger
         required -= thislogger.level_info[:supported]
         raise InjectedLogger::UnsupportedLevels.new(required) unless required.empty?
       end
-      on.send :define_method, method_name do
-        thislogger
+      targets.each do |target|
+        target.send :define_method, method_name do
+          thislogger
+        end
       end
       thislogger.after_hook.call(thislogger) if thislogger.after_hook
       thislogger.send :ready
       thislogger
+    end
+    targets.each do |target|
+      target.send :define_method, method_name, prelogger
     end
   end
 
