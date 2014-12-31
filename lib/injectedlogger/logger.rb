@@ -49,6 +49,8 @@ module InjectedLogger
     end
 
     def inject!(logger_obj, levels: LOGLEVELS, fallback: UNKNOWN, prefix: nil)
+      # allow injecting ourselves without stacking delegators
+      logger_obj = logger_obj.send :logger if logger_obj.is_a? self.class
       self.logger = logger_obj
       set_prefix prefix
       set_levels levels
