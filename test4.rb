@@ -87,3 +87,15 @@ test E
 NL.logger.info do
   'done'
 end
+
+module Other
+  InjectedLogger.use :info, :debug, :invented do end
+end
+
+Other.inject NL.logger, prefix: '[injected-ourselves]'
+
+class F < Messaging
+  include Other
+end
+
+test F
